@@ -16,10 +16,10 @@ import org.codehaus.jackson.node.ArrayNode;
 
 public class dataAggregator {
 
-	final static String FILE_NAME = "/Users/Shared/testData/PROD_data_check_08022018.xlsx";
-	final static String buyOnlineUrl = "";
-	final String carDealerUrl = "";
-	final String carDealerByIdUrl = "";
+	final static String FILE_NAME = "/Users/Shared/testData/PROD_data_check_16022018_2.xlsx";
+	final static String buyOnlineUrl = "http://pre-vtp.audi.com/restapi/v1/adegwb/search/car;t_online=1/results";
+	final String carDealerUrl = "http://pre-vtp.audi.com/restapi/v1/adegwb/datastore/cars/";
+	final String carDealerByIdUrl = "http://www.audi-boerse.de/gebrauchtwagen/url-2_1-search.htm?act=offer&carid=";
 	final static String xPageItems = "100";
 	static int numberOfReturnedCars = 1;
 
@@ -81,7 +81,7 @@ public class dataAggregator {
 		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 		conn.setRequestMethod("GET");
 		conn.setRequestProperty("Accept", "application/json");
-		conn.setRequestProperty("X-Pattern", "");
+		conn.setRequestProperty("X-Pattern", "Audi_EComGW_ae8bd28b");
 		conn.setRequestProperty("X-Page-Items", xPageItems);
 		conn.setRequestProperty("X-Page", xPage);
 
@@ -105,10 +105,18 @@ public class dataAggregator {
 			JsonNode carNode = carsNodeIterator.next();
 
 			CarDealerSelector car = new CarDealerSelector();
+			if (carNode.path("car").path("carid").getTextValue().equals("DEU28100A1 WQS 04")) {
+				System.out.println("Das ist die ID: DEU28100A1 WQS 04");
+			}
 			car.setCarId(carNode.path("car").path("carid").getTextValue());
 			car.setDealerKey(carNode.path("car").path("hypermediadealer").path("key").getTextValue());
 			car.setDealerHref(carNode.path("car").path("hypermediadealer").path("href").getTextValue());
-			car.setCarDealerUrl(carDealerUrl + car.getCarId());
+			if (car.getCarId().contains(" ")) {
+				String escapedCarId = car.getCarId().replaceAll(" ", "%20");
+				car.setCarDealerUrl(carDealerUrl + escapedCarId);
+			} else {
+				car.setCarDealerUrl(carDealerUrl + car.getCarId());
+			}
 			car.setLinkToCarById(carDealerByIdUrl + car.getCarId());
 			
 			ArrayNode itemsNode = (ArrayNode) carNode.path("car").path("items");
@@ -140,33 +148,7 @@ public class dataAggregator {
 			HttpURLConnection conn = getHttpConnection(car.getCarDealerUrl(), "1");
 			String jsonOutputCarDetail = readInputStream(conn);
 
-			JsonNode carDetailNode = new ObjectMapper().readTree(jsonOutputCarDetail);
-			ArrayNode carDetailsItemsNode = (ArrayNode) carDetailNode.get("items");
-			Iterator<JsonNode> carsDetailItemsNodeIterator = carDetailsItemsNode.getElements();
-
-			while (carsDetailItemsNodeIterator.hasNext()) {
-				JsonNode itemNode = carsDetailItemsNodeIterator.next();
-				if (itemNode.path("key").getTextValue().equals("knr")) {
-					car.setCommissionId(itemNode.path("value").getTextValue());
-				}
-				if (itemNode.path("key").getTextValue().equals("vin")) {
-					car.setVin(itemNode.path("value").getTextValue());
-				}
-				if (itemNode.path("key").getTextValue().equals("residual_value_reduction")) {
-					car.setReduction(itemNode.path("value").getTextValue());
-				}
-				if (itemNode.path("key").getTextValue().equals("fsFinance")) {
-					JsonNode fsFinanceNode = itemNode.get("values");
-					Iterator<JsonNode> fsFinanceNodeIterator = fsFinanceNode.getElements();
-					while (fsFinanceNodeIterator.hasNext()) {
-						JsonNode fsNode = fsFinanceNodeIterator.next();
-						if (fsNode.path("key").getTextValue().equals("firstUsage")) {
-							car.setFirstUsage(fsNode.path("value").getTextValue());
-							break;
-						}
-					}
-				}
-			}
+			Helpers.getCarsDetails(car, jsonOutputCarDetail);
 
 			listOfCarsWithDealers.add(car);
 		}
@@ -175,5 +157,7 @@ public class dataAggregator {
 
 		return listOfCarsWithDealers;
 	}
+
+
 
 }

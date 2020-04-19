@@ -1,6 +1,10 @@
 import org.apache.poi.EncryptedDocumentException;
+import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
@@ -12,6 +16,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import java.awt.Color;
 
 public class IOOperations {
 
@@ -40,8 +46,14 @@ public class IOOperations {
 			workbook = new XSSFWorkbook();
 			sheet = workbook.createSheet(nameSheet);
 		}
-		
+
 		int rowNum = lastRow;
+
+		CellStyle style = workbook.createCellStyle();
+		style.setFillBackgroundColor(IndexedColors.AQUA.getIndex());
+		style.setFillPattern(FillPatternType.BIG_SPOTS);
+
+		XSSFColor colorGreen = new XSSFColor(Color.GREEN);
 
 		for (CarDealerSelector objectFromList : finalJavaObject) {
 
@@ -87,18 +99,103 @@ public class IOOperations {
 			cell = row.createCell(colNum++);
 			if (objectFromList.getCarDealerUrl() instanceof String) {
 				cell.setCellValue(objectFromList.getCarDealerUrl());
-			} 
+			}
 			cell = row.createCell(colNum++);
 			if (objectFromList.getLinkToCarById() instanceof String) {
 				cell.setCellValue(objectFromList.getLinkToCarById());
-			} 
+			}
 			cell = row.createCell(colNum++);
 			if (objectFromList.getFirstUsage() instanceof String) {
 				cell.setCellValue(objectFromList.getFirstUsage());
-			} 
+			}
 			cell = row.createCell(colNum++);
 			if (objectFromList.getReduction() instanceof String) {
 				cell.setCellValue(objectFromList.getReduction());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getFuel() instanceof String) {
+				cell.setCellValue(objectFromList.getFuel());
+				setCellColor(cell, workbook, objectFromList.getFuel());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getPowerKw() instanceof String) {
+				cell.setCellValue(objectFromList.getPowerKw());
+				setCellColor(cell, workbook, objectFromList.getPowerKw());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getPowerPs() instanceof String) {
+				cell.setCellValue(objectFromList.getPowerPs());
+				setCellColor(cell, workbook, objectFromList.getPowerPs());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getGear() instanceof String) {
+				cell.setCellValue(objectFromList.getGear());
+				setCellColor(cell, workbook, objectFromList.getGear());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getDrive() instanceof String) {
+				cell.setCellValue(objectFromList.getDrive());
+				setCellColor(cell, workbook, objectFromList.getDrive());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getConsumptionComb() instanceof String) {
+				cell.setCellValue(objectFromList.getConsumptionComb());
+				setCellColor(cell, workbook, objectFromList.getConsumptionComb());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getColorOut() instanceof String) {
+				cell.setCellValue(objectFromList.getColorOut());
+				setCellColor(cell, workbook, objectFromList.getColorOut());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getColorSeat() instanceof String) {
+				cell.setCellValue(objectFromList.getColorSeat());
+				setCellColor(cell, workbook, objectFromList.getColorSeat());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getPadtype() instanceof String) {
+				cell.setCellValue(objectFromList.getPadtype());
+				setCellColor(cell, workbook, objectFromList.getPadtype());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getInitialreg() instanceof String) {
+				cell.setCellValue(objectFromList.getInitialreg());
+				setCellColor(cell, workbook, objectFromList.getInitialreg());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getMileage() instanceof String) {
+				cell.setCellValue(objectFromList.getMileage());
+				setCellColor(cell, workbook, objectFromList.getMileage());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getGeneralInspection() instanceof String) {
+				cell.setCellValue(objectFromList.getGeneralInspection());
+				setCellColor(cell, workbook, objectFromList.getGeneralInspection());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getAvailableFrom() instanceof String) {
+				cell.setCellValue(objectFromList.getAvailableFrom());
+				setCellColor(cell, workbook, objectFromList.getAvailableFrom());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getPreuse() instanceof String) {
+				cell.setCellValue(objectFromList.getPreuse());
+				setCellColor(cell, workbook, objectFromList.getPreuse());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getPown() instanceof String) {
+				cell.setCellValue(objectFromList.getPown());
+				setCellColor(cell, workbook, objectFromList.getPown());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getAsg() instanceof String) {
+				cell.setCellValue(objectFromList.getAsg());
+				setCellColor(cell, workbook, objectFromList.getAsg());
+			}
+			cell = row.createCell(colNum++);
+			if (objectFromList.getGwplus() instanceof String) {
+				cell.setCellValue(objectFromList.getGwplus());
+				cell.setCellStyle(style);
 			} else {
 				cell.setCellValue("Non-string input");
 				System.out.println("somehow some non-string value appeared.");
@@ -115,8 +212,21 @@ public class IOOperations {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		System.out.println("Done");
+	}
+
+	protected static Cell setCellColor(Cell cell, XSSFWorkbook wb, String value) {
+		CellStyle style = wb.createCellStyle();
+		
+		if (value.isEmpty()) {
+			style.setFillBackgroundColor(HSSFColor.RED.index);	
+		} else {
+			style.setFillBackgroundColor(HSSFColor.WHITE.index);
+		}
+		style.setFillPattern(FillPatternType.THIN_BACKWARD_DIAG);
+		cell.setCellStyle(style);
+
+		return cell;
 	}
 
 	public static List<String> readFromExcel() {
